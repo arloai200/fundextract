@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>FundExtract — Task Pane Preview</title>
+  <style>
+    /* Page chrome */
+    body { margin: 0; padding: 20px 40px; background: #e8e8e8; font-family: "Segoe UI", sans-serif; display: flex; flex-direction: column; align-items: center; }
+    h1 { font-size: 16px; color: #323130; margin-bottom: 6px; }
+    p  { font-size: 12px; color: #605e5c; margin-bottom: 20px; }
+    .pane-wrap { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+    .pane { width: 320px; background: #f8f8f8; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .pane-label { text-align: center; font-size: 11px; color: #605e5c; margin-top: 8px; margin-bottom: 20px; }
+
+    /* ── FundExtract Task Pane Styles ── */
+    :root {
+      --navy: #1b3a6b; --blue-accent: #0078d4; --blue-light: #deecf9;
+      --green: #107c10; --orange: #c55400; --red: #a4262c;
+      --bg: #f8f8f8; --surface: #ffffff; --border: #edebe9;
+      --text-main: #323130; --text-sub: #605e5c;
+      --radius: 4px; --shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .fe-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 10px; background: var(--navy); color: #fff; }
+    .fe-logo { width: 28px; height: 28px; border-radius: 4px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .fe-title { color: #fff; font-size: 14px; font-weight: 600; line-height: 1.2; }
+    .fe-subtitle { color: rgba(255,255,255,0.7); font-size: 11px; }
+    .fe-screen { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .fe-dropzone { border: 2px dashed #c7e0f4; border-radius: var(--radius); background: var(--surface); padding: 24px 16px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .fe-dropzone-icon { font-size: 32px; }
+    .fe-dropzone-text { color: var(--text-sub); font-size: 13px; line-height: 1.5; }
+    .fe-link { color: var(--blue-accent); text-decoration: underline; }
+    .fe-options { display: flex; flex-direction: column; gap: 8px; }
+    .fe-option-row { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+    .fe-select { margin-left: auto; padding: 4px 8px; border: 1px solid #c8c6c4; border-radius: var(--radius); font-size: 12px; background: white; }
+    .fe-btn-primary { width: 100%; padding: 10px; background: var(--blue-accent); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 14px; }
+    .fe-btn-secondary { width: 100%; padding: 10px; background: var(--surface); color: var(--blue-accent); border: 1px solid var(--blue-accent); border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 14px; }
+    .fe-btn-link { background: none; border: none; color: var(--blue-accent); cursor: pointer; text-decoration: underline; font-size: 12px; text-align: center; }
+    .fe-processing-title { color: var(--navy); text-align: center; padding-top: 8px; font-size: 15px; font-weight: 600; }
+    .fe-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .fe-step { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius); font-size: 13px; color: var(--text-sub); }
+    .fe-step::before { content: "○"; font-size: 16px; min-width: 20px; text-align: center; }
+    .fe-step.active { background: var(--blue-light); color: var(--blue-accent); font-weight: 600; }
+    .fe-step.active::before { content: "⟳"; }
+    .fe-step.done { color: var(--green); }
+    .fe-step.done::before { content: "✓"; }
+    .fe-progress-bar-wrap { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .fe-progress-bar { height: 100%; background: var(--blue-accent); }
+    .fe-results-icon { font-size: 40px; text-align: center; padding-top: 8px; }
+    .fe-results-title { text-align: center; color: var(--navy); font-size: 15px; font-weight: 600; }
+    .fe-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
+    .fe-card-label { font-size: 13px; font-weight: 600; }
+    .fe-confidence-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .fe-badge { padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .fe-badge-high { background: #dff6dd; color: var(--green); }
+    .fe-badge-medium { background: #fff4ce; color: #7d6300; }
+    .fe-badge-low { background: #fed9cc; color: var(--orange); }
+    .fe-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .fe-checklist li { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .fe-check-pass { color: var(--green); }
+  </style>
+</head>
+<body>
+  <h1>FundExtract — Task Pane UI Preview</h1>
+  <p>This is a static preview of all three task pane screens. Open taskpane.html in Excel to use the live add-in.</p>
+
+  <div class="pane-wrap">
+
+    <!-- ── Screen 1: UPLOAD ───────────────────────────────────────────── -->
+    <div>
+      <div class="pane">
+        <div class="fe-header">
+          <div class="fe-logo">📊</div>
+          <div>
+            <div class="fe-title">FundExtract</div>
+            <div class="fe-subtitle">Mutual Fund Data Extraction</div>
+          </div>
+        </div>
+        <div class="fe-screen">
+          <div class="fe-dropzone">
+            <div class="fe-dropzone-icon">📄</div>
+            <div class="fe-dropzone-text">
+              Drag &amp; drop annual report PDF<br/>
+              or <span class="fe-link">browse</span>
+            </div>
+          </div>
+          <div class="fe-options">
+            <label class="fe-option-row">
+              <input type="checkbox" checked/>
+              <span>Extract prior year (PY) data</span>
+            </label>
+            <label class="fe-option-row">
+              <span>Units</span>
+              <select class="fe-select">
+                <option selected>Auto-detect</option>
+                <option>Actual $</option>
+                <option>$ thousands</option>
+                <option>$ millions</option>
+              </select>
+            </label>
+          </div>
+          <button class="fe-btn-primary">Extract Data</button>
+        </div>
+      </div>
+      <div class="pane-label">Screen 1 — Upload</div>
+    </div>
+
+    <!-- ── Screen 2: PROCESSING ───────────────────────────────────────── -->
+    <div>
+      <div class="pane">
+        <div class="fe-header">
+          <div class="fe-logo">📊</div>
+          <div>
+            <div class="fe-title">FundExtract</div>
+            <div class="fe-subtitle">Mutual Fund Data Extraction</div>
+          </div>
+        </div>
+        <div class="fe-screen">
+          <div class="fe-processing-title">Extracting…</div>
+          <ul class="fe-steps">
+            <li class="fe-step done">Parsing table of contents</li>
+            <li class="fe-step done">Identifying statement pages</li>
+            <li class="fe-step active">Extracting SOA (Assets &amp; Liabilities)</li>
+            <li class="fe-step">Extracting SOO (Operations)</li>
+            <li class="fe-step">Extracting SOCS (Changes in Net Assets)</li>
+            <li class="fe-step">Extracting SOCF (Cash Flows)</li>
+            <li class="fe-step">Extracting FNS (Financial Highlights)</li>
+            <li class="fe-step">Writing data to workbook</li>
+          </ul>
+          <div class="fe-progress-bar-wrap">
+            <div class="fe-progress-bar" style="width:38%"></div>
+          </div>
+          <div style="text-align:center; font-size:11px; color:#605e5c;">Step 3 of 8…</div>
+        </div>
+      </div>
+      <div class="pane-label">Screen 2 — Processing</div>
+    </div>
+
+    <!-- ── Screen 3: RESULTS ──────────────────────────────────────────── -->
+    <div>
+      <div class="pane">
+        <div class="fe-header">
+          <div class="fe-logo">📊</div>
+          <div>
+            <div class="fe-title">FundExtract</div>
+            <div class="fe-subtitle">Mutual Fund Data Extraction</div>
+          </div>
+        </div>
+        <div class="fe-screen">
+          <div class="fe-results-icon">✅</div>
+          <div class="fe-results-title">147 line items extracted across 5 statements</div>
+          <div class="fe-card">
+            <div class="fe-card-label">Confidence breakdown</div>
+            <div class="fe-confidence-row">
+              <span class="fe-badge fe-badge-high">138 High</span>
+              <span class="fe-badge fe-badge-medium">7 Medium</span>
+              <span class="fe-badge fe-badge-low">2 Low</span>
+            </div>
+          </div>
+          <div class="fe-card">
+            <div class="fe-card-label">Cross-statement checks</div>
+            <ul class="fe-checklist">
+              <li><span class="fe-check-pass">✓</span> SOA: Assets = Liab + Net Assets</li>
+              <li><span class="fe-check-pass">✓</span> SOCS Ending NA ties to SOA Net Assets</li>
+              <li><span class="fe-check-pass">✓</span> SOO Net Ops ties to SOCS Operations</li>
+              <li><span class="fe-check-pass">✓</span> SOCF Ending Cash ties to SOA Cash</li>
+            </ul>
+          </div>
+          <div class="fe-card">
+            <div class="fe-card-label">Units detected</div>
+            <div style="font-size:13px; color:#605e5c;">Values in thousands</div>
+          </div>
+          <button class="fe-btn-secondary">Extract Another PDF</button>
+          <button class="fe-btn-link">View extraction log ›</button>
+        </div>
+      </div>
+      <div class="pane-label">Screen 3 — Results</div>
+    </div>
+
+  </div>
+</body>
+</html>

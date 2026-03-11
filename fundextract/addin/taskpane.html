@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FundExtract</title>
+
+  <!-- Office.js — must be first -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+
+  <!-- Fluent UI (Microsoft design system) -->
+  <link rel="stylesheet"
+        href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
+
+  <link rel="stylesheet" href="taskpane.css" />
+</head>
+<body class="ms-font-m ms-Fabric">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="fe-header">
+    <img src="assets/icon-32.png" alt="FundExtract" class="fe-logo" />
+    <div>
+      <div class="fe-title ms-font-l ms-fontWeight-semibold">FundExtract</div>
+      <div class="fe-subtitle ms-font-xs ms-fontColor-neutralSecondary">
+        Mutual Fund Data Extraction
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SCREEN 1 — UPLOAD
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="screen-upload" class="fe-screen">
+
+    <!-- Drop zone -->
+    <div id="drop-zone" class="fe-dropzone" role="button" tabindex="0"
+         aria-label="Drag and drop a PDF or click to browse">
+      <div class="fe-dropzone-icon">📄</div>
+      <div class="fe-dropzone-text ms-font-s">
+        Drag &amp; drop annual report PDF<br/>
+        or <span class="fe-link" id="browse-link">browse</span>
+      </div>
+      <div id="file-name" class="fe-filename ms-font-xs ms-fontColor-neutralSecondary"></div>
+      <input type="file" id="file-input" accept=".pdf" class="fe-file-input" />
+    </div>
+
+    <!-- Options -->
+    <div class="fe-options">
+      <label class="fe-option-row">
+        <input type="checkbox" id="opt-extract-py" checked />
+        <span class="ms-font-s">Extract prior year (PY) data</span>
+      </label>
+
+      <label class="fe-option-row">
+        <span class="ms-font-s">Units</span>
+        <select id="opt-units" class="fe-select ms-font-s">
+          <option value="auto">Auto-detect</option>
+          <option value="actual">Actual $</option>
+          <option value="thousands">$ thousands</option>
+          <option value="millions">$ millions</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Extract button -->
+    <button id="btn-extract" class="fe-btn-primary ms-font-m" disabled>
+      Extract Data
+    </button>
+
+    <div id="upload-error" class="fe-error ms-font-xs" aria-live="polite"></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SCREEN 2 — PROCESSING
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="screen-processing" class="fe-screen fe-hidden">
+    <div class="fe-processing-title ms-font-m ms-fontWeight-semibold">Extracting…</div>
+
+    <ul class="fe-steps" id="steps-list">
+      <li data-step="toc"      class="fe-step">Parsing table of contents</li>
+      <li data-step="sections" class="fe-step">Identifying statement pages</li>
+      <li data-step="soa"      class="fe-step">Extracting SOA (Assets &amp; Liabilities)</li>
+      <li data-step="soo"      class="fe-step">Extracting SOO (Operations)</li>
+      <li data-step="socs"     class="fe-step">Extracting SOCS (Changes in Net Assets)</li>
+      <li data-step="socf"     class="fe-step">Extracting SOCF (Cash Flows)</li>
+      <li data-step="fns"      class="fe-step">Extracting FNS (Financial Highlights)</li>
+      <li data-step="write"    class="fe-step">Writing data to workbook</li>
+    </ul>
+
+    <div class="fe-progress-bar-wrap">
+      <div id="progress-bar" class="fe-progress-bar" style="width:0%"></div>
+    </div>
+    <div id="progress-label" class="ms-font-xs ms-fontColor-neutralSecondary" style="text-align:center"></div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SCREEN 3 — RESULTS
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="screen-results" class="fe-screen fe-hidden">
+    <div class="fe-results-icon">✅</div>
+    <div class="fe-results-title ms-font-l ms-fontWeight-semibold" id="results-headline"></div>
+
+    <!-- Confidence breakdown -->
+    <div class="fe-card">
+      <div class="ms-font-s ms-fontWeight-semibold">Confidence breakdown</div>
+      <div class="fe-confidence-row">
+        <span class="fe-badge fe-badge-high" id="conf-high">— High</span>
+        <span class="fe-badge fe-badge-medium" id="conf-medium">— Medium</span>
+        <span class="fe-badge fe-badge-low" id="conf-low">— Low</span>
+      </div>
+    </div>
+
+    <!-- Cross-checks -->
+    <div class="fe-card" id="cross-checks-card">
+      <div class="ms-font-s ms-fontWeight-semibold">Cross-statement checks</div>
+      <ul id="cross-checks-list" class="fe-checklist"></ul>
+    </div>
+
+    <!-- Units detected -->
+    <div class="fe-card">
+      <div class="ms-font-s ms-fontWeight-semibold">Units detected</div>
+      <div id="units-label" class="ms-font-s ms-fontColor-neutralSecondary"></div>
+    </div>
+
+    <button id="btn-extract-another" class="fe-btn-secondary ms-font-m">
+      Extract Another PDF
+    </button>
+
+    <button id="btn-view-log" class="fe-btn-link ms-font-xs">
+      View extraction log ›
+    </button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       MODAL — Extraction Log
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="modal-log" class="fe-modal fe-hidden" role="dialog" aria-modal="true"
+       aria-label="Extraction log">
+    <div class="fe-modal-inner">
+      <div class="fe-modal-header">
+        <span class="ms-font-m ms-fontWeight-semibold">Extraction Log</span>
+        <button id="btn-close-log" class="fe-modal-close" aria-label="Close">✕</button>
+      </div>
+      <pre id="log-content" class="fe-log"></pre>
+    </div>
+  </div>
+
+  <script src="taskpane.js" type="module"></script>
+</body>
+</html>

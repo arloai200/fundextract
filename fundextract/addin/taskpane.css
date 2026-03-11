@@ -1,0 +1,341 @@
+/* ── FundExtract Task Pane Styles ────────────────────────────────────────── */
+/* Inspired by Fluent UI / Office design system.                             */
+/* Target width: ~320px (Office task pane default).                          */
+
+:root {
+  --navy:         #1b3a6b;
+  --blue-accent:  #0078d4;
+  --blue-light:   #deecf9;
+  --green:        #107c10;
+  --orange:       #c55400;
+  --red:          #a4262c;
+  --bg:           #f8f8f8;
+  --surface:      #ffffff;
+  --border:       #edebe9;
+  --text-main:    #323130;
+  --text-sub:     #605e5c;
+  --radius:       4px;
+  --shadow:       0 1px 4px rgba(0,0,0,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.fe-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 10px;
+  background: var(--navy);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.fe-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  padding: 2px;
+}
+
+.fe-title  { color: #fff; line-height: 1.2; }
+.fe-subtitle { color: rgba(255,255,255,0.7); }
+
+/* ── Screens ─────────────────────────────────────────────────────────────── */
+.fe-screen {
+  padding: 16px;
+  min-height: calc(100vh - 54px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fe-hidden { display: none !important; }
+
+/* ── Drop Zone ───────────────────────────────────────────────────────────── */
+.fe-dropzone {
+  border: 2px dashed #c7e0f4;
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.fe-dropzone:hover,
+.fe-dropzone.drag-over {
+  border-color: var(--blue-accent);
+  background: var(--blue-light);
+}
+
+.fe-dropzone-icon { font-size: 32px; }
+
+.fe-dropzone-text { color: var(--text-sub); line-height: 1.5; }
+
+.fe-link {
+  color: var(--blue-accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.fe-filename {
+  margin-top: 4px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.fe-file-input { display: none; }
+
+/* ── Options ─────────────────────────────────────────────────────────────── */
+.fe-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fe-option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.fe-select {
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 1px solid #c8c6c4;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.fe-btn-primary {
+  width: 100%;
+  padding: 10px;
+  background: var(--blue-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.fe-btn-primary:hover:not(:disabled) { background: #106ebe; }
+.fe-btn-primary:disabled {
+  background: #c8c6c4;
+  cursor: not-allowed;
+}
+
+.fe-btn-secondary {
+  width: 100%;
+  padding: 10px;
+  background: var(--surface);
+  color: var(--blue-accent);
+  border: 1px solid var(--blue-accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.fe-btn-secondary:hover { background: var(--blue-light); }
+
+.fe-btn-link {
+  background: none;
+  border: none;
+  color: var(--blue-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  text-align: center;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
+.fe-error {
+  color: var(--red);
+  min-height: 16px;
+}
+
+/* ── Processing screen ───────────────────────────────────────────────────── */
+.fe-processing-title {
+  color: var(--navy);
+  text-align: center;
+  padding-top: 8px;
+}
+
+.fe-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fe-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-sub);
+  transition: background 0.2s;
+}
+
+.fe-step::before {
+  content: "○";
+  font-size: 16px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.fe-step.active {
+  background: var(--blue-light);
+  color: var(--blue-accent);
+  font-weight: 600;
+}
+
+.fe-step.active::before { content: "⟳"; animation: spin 1s linear infinite; }
+
+.fe-step.done { color: var(--green); }
+.fe-step.done::before { content: "✓"; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.fe-progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.fe-progress-bar {
+  height: 100%;
+  background: var(--blue-accent);
+  transition: width 0.4s ease;
+}
+
+/* ── Results screen ──────────────────────────────────────────────────────── */
+.fe-results-icon { font-size: 40px; text-align: center; padding-top: 8px; }
+.fe-results-title { text-align: center; color: var(--navy); }
+
+.fe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.fe-confidence-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fe-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fe-badge-high   { background: #dff6dd; color: var(--green); }
+.fe-badge-medium { background: #fff4ce; color: #7d6300; }
+.fe-badge-low    { background: #fed9cc; color: var(--orange); }
+
+.fe-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fe-checklist li {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fe-check-pass { color: var(--green); }
+.fe-check-review { color: var(--orange); }
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.fe-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+.fe-modal-inner {
+  background: var(--surface);
+  width: 100%;
+  max-height: 75vh;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+}
+
+.fe-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fe-modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-sub);
+}
+
+.fe-log {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 11px;
+  color: var(--text-sub);
+  padding: 12px 16px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  flex: 1;
+}
